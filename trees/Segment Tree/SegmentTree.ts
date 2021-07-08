@@ -1,33 +1,19 @@
-class SegmentNode {
-    value: number;
-    left: number;
-    right: number;
-
-    constructor(value: number, left: number, right: number) {
-        this.value = value;
-        this.left = left;
-        this.right = right;
-    }
-}
-
 class SegmentTree {
-    tree: SegmentNode[];
+    private tree: number[];
+    private size: number;
 
     constructor(arr: number[]) {
         this.tree = [];
-        this.build(arr, 0, 0, arr.length-1);
+        this.size = arr.length;
+        this.build(arr, 0, 0, this.size-1);
     }
 
     queryMax(left: number, right: number): number {
-        let segLeft: number = this.tree[0].left;
-        let segRight: number = this.tree[0].right;
-        return this.queryMaxHelper(left, right, segLeft, segRight, 0);
+        return this.queryMaxHelper(left, right, 0, this.size-1, 0);
     }
 
     update(index: number, value: number): void {
-        let segLeft: number = this.tree[0].left;
-        let segRight: number = this.tree[0].right;
-        this.updateHelper(index, segLeft, segRight, 0, value);
+        this.updateHelper(index, 0, this.size-1, 0, value);
     }
 
     private build(arr: number[], index: number, leftIndex: number, rightIndex: number): number {
@@ -42,7 +28,7 @@ class SegmentTree {
                     this.build(arr, SegmentTree.rightChild(index), mid + 1, rightIndex)
                     );
         }
-        this.tree[index] = new SegmentNode(max, leftIndex, rightIndex);
+        this.tree[index] = max;
         return max;
     }
 
@@ -52,7 +38,7 @@ class SegmentTree {
         }
 
         if (left <= segLeft && segRight <= right) {
-            return this.tree[index].value;
+            return this.tree[index];
         }
 
         let mid = SegmentTree.getMid(segLeft, segRight);
@@ -69,7 +55,7 @@ class SegmentTree {
         }
 
         if (segLeft == segRight) {
-            this.tree[node].value = value;
+            this.tree[node] = value;
         }
         else {
             let mid = SegmentTree.getMid(segLeft, segRight);
@@ -80,9 +66,9 @@ class SegmentTree {
                 this.updateHelper(index, mid+1, segRight, SegmentTree.rightChild(node), value);
             }
 
-            this.tree[node].value = Math.max(
-                this.tree[SegmentTree.leftChild(node)].value, 
-                this.tree[SegmentTree.rightChild(node)].value
+            this.tree[node] = Math.max(
+                this.tree[SegmentTree.leftChild(node)], 
+                this.tree[SegmentTree.rightChild(node)]
             );
         }
     }
